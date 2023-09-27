@@ -50,12 +50,12 @@ namespace casApi
         private async Task<ErrorsAnd<ContentItem>> processNewItem(ContentItem contentItem)
         {
             await casRepo.Àdd(contentItem);
-            return ErrorsAnd<ContentItem>.value(contentItem);
+            return ErrorsAndMaker.value<ContentItem>(contentItem);
         }
 
         private async Task<ErrorsAnd<ContentItem>> processExistingItem(ContentItem existing, string computedSha, byte[] content)
         {
-            return ErrorsAnd<ContentItem>.errorsOr(shaCodec.validateAgainst(computedSha, "Sha collision").Validate(existing.Data), existing);
+            return ErrorsAndMaker.errorsOr<ContentItem>(shaCodec.validateAgainst(computedSha, "Sha collision").Validate(existing.Data), existing);
         }
 
 

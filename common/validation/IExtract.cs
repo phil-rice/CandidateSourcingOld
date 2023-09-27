@@ -26,8 +26,8 @@ namespace xingyi.common.validator
             {
                 var t = func(from);
                 var errors = validator.Validate(t);
-                if (errors.Any()) return ErrorsAnd<To>.errors(errors);
-                return ErrorsAnd<To>.value(func(from));
+                if (errors.Any()) return ErrorsAndMaker.errors<To>(errors);
+                return ErrorsAndMaker.value<To>(func(from));
             });
         }
 
@@ -50,9 +50,9 @@ namespace xingyi.common.validator
                 var result2 = e2.extract(from);
                 if (result1.HasErrors() || result2.HasErrors())
 
-                    return ErrorsAnd<To>.errors(result1.Errors.Concat(result2.Errors));
+                    return ErrorsAndMaker.errors<To>(result1.Errors.Concat(result2.Errors));
                 else
-                    return ErrorsAnd<To>.value(merge(result1.Value, result2.Value));
+                    return ErrorsAndMaker.value<To>(merge(result1.Value, result2.Value));
             });
         }
         public static IExtract<From, To> Compose<From, T1, T2, T3, To>(
@@ -68,9 +68,9 @@ namespace xingyi.common.validator
                 var result3 = e3.extract(from);
                 if (result1.HasErrors() || result2.HasErrors() || result3.HasErrors())
 
-                    return ErrorsAnd<To>.errors(result1.Errors.Concat(result2.Errors).Concat(result3.Errors));
+                    return ErrorsAndMaker.errors<To>(result1.Errors.Concat(result2.Errors).Concat(result3.Errors));
                 else
-                    return ErrorsAnd<To>.value(merge(result1.Value, result2.Value, result3.Value));
+                    return ErrorsAndMaker.value<To>(merge(result1.Value, result2.Value, result3.Value));
             });
         }
         public static IExtract<From, To> Compose<From, T1, T2, T3, T4, To>(
@@ -88,9 +88,9 @@ namespace xingyi.common.validator
                 var result4 = e4.extract(from);
                 if (result1.HasErrors() || result2.HasErrors() || result3.HasErrors() || result4.HasErrors())
 
-                    return ErrorsAnd<To>.errors(result1.Errors.Concat(result2.Errors).Concat(result3.Errors).Concat(result4.Errors));
+                    return ErrorsAndMaker.errors<To>(result1.Errors.Concat(result2.Errors).Concat(result3.Errors).Concat(result4.Errors));
                 else
-                    return ErrorsAnd<To>.value(merge(result1.Value, result2.Value, result3.Value, result4.Value));
+                    return ErrorsAndMaker.value<To>(merge(result1.Value, result2.Value, result3.Value, result4.Value));
             });
         }
 

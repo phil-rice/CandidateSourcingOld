@@ -1,55 +1,48 @@
 ﻿using System.Net.Http.Headers;
+using xingyi.cas.common;
 using xingyi.common;
+using xingyi.common.http;
 
 namespace xingyi.cas.client
 {
     public interface ICasAdder
     {
-        Task<string> AddItemAsync(string nameSpace,byte[] payload, string mimeType);
+        Task<string> AddItemAsync(string nameSpace, byte[] payload, string mimeType);
     }
 
     public interface ICasGetter
     {
-        Task<byte[]> GetItemAsync(string nameSpace,string sha);
+        Task<ContentItem> GetItemAsync(string nameSpace, string sha);
     }
+
+
     public class CasClient : ICasAdder, ICasGetter
     {
-        private readonly HttpClient _httpClient;
+        private readonly IHttpClient httpClient;
         private readonly IShaCodec shaCodec;
 
-        public CasClient(HttpClient httpClient, IShaCodec shaCodec,string host)
+        public CasClient(IHttpClient httpClient, IShaCodec shaCodec)
         {
-            _httpClient = httpClient;
+            this.httpClient = httpClient;
             this.shaCodec = shaCodec;
-            _httpClient.BaseAddress = new Uri(host);
         }
 
-        public async Task<string> AddItemAsync(string nameSpace,byte[] payload, string mimeType)
+
+        public async Task<string> AddItemAsync(string nameSpace, byte[] payload, string mimeType)
         {
-            using var content = new ByteArrayContent(payload);
-            content.Headers.ContentType = new MediaTypeHeaderValue(mimeType);
-
-            var response = await _httpClient.PostAsync($"/cas/{nameSpace}", content);
-
-            if (!response.IsSuccessStatusCode)
-            {
-                var responseConent = await response.Content.ReadAsStringAsync();
-                throw new HttpRequestException($"Error adding item: {nameSpace} {response.StatusCode}/{responseConent}");
-            }
-
+            var response = (await httpClient.post($"/cas/{nameSpace}", mimeType, payload)).valueOrError();
             return await response.Content.ReadAsStringAsync();
         }
 
-        public async Task<byte[]> GetItemAsync(string nameSpace,string sha)
+        public async Task<ContentItem> GetItemAsync(string nameSpace, string sha)
         {
-            var response = await _httpClient.GetAsync($"/case/{nameSpace}/content/{sha}");
-
-            if (!response.IsSuccessStatusCode)
-            {
-                throw new HttpRequestException($"Error retrieving item {nameSpace}/${sha}: {response.StatusCode}/{response.Content.ToString}");
-            }
-
-            return await response.Content.ReadAsByteArrayAsync();
+            var response = (await httpClient.get($"/cas/{nameSpace}/content/{sha}")).valueOrError();
+            if (response == null) return null;
+            var MimeType = response.Content.Headers?.ContentType?.ToString() ?? "";
+            var data = await response.Content.ReadAsByteArrayAsync();
+            var checkedSha = shaCodec.ComputeSha(data);
+            if (checkedSha != sha) throw new ShaMismatchException(sha, checkedSha, data);
+            return new ContentItem(nameSpace, sha, MimeType, data);
         }
     }
 
