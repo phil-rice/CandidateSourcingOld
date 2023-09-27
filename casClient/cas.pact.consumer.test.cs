@@ -48,21 +48,19 @@
               })
               .WillRespondWith(new ProviderServiceResponse
               {
-                  Status = 200,
-                  Headers = new Dictionary<string, object>
-                  {
-                  },
-                  Body = "ResponseSHA" // mock response
+                  Status = 201,
+                  Headers = new Dictionary<string, object> { { "Content-Type", "text/plain; charset=utf-8" }},
+                  Body = "/cas/someNs/content/h9FJy0JMA4dlbyEdJYn7Wx4WIpkhMJ6YWIQZzMqKc2I"
               });
             byte[] bytes = Encoding.ASCII.GetBytes("somedata");
-            var result = await Client.AddItemAsync("someNs", bytes, "application/octet-stream");
+        var result = await Client.AddItemAsync("someNs", bytes, "application/octet-stream");
 
-            Assert.Equal("ResponseSHA", result);
+        Assert.Equal("/cas/someNs/content/h9FJy0JMA4dlbyEdJYn7Wx4WIpkhMJ6YWIQZzMqKc2I", result);
 
             _mockProviderService.VerifyInteractions();
             pactBuilder.Build();
         }
 
 
-    }
+}
 }
