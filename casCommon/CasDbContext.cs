@@ -16,7 +16,7 @@
             base.OnModelCreating(modelBuilder);
 
             modelBuilder.Entity<ContentItem>()
-                .HasKey(c => new { c.SHA, c.Namespace });
+                .HasKey(c => new {  c.Namespace, c.SHA });
         }
 
         public Task<int> saveAllChanges()

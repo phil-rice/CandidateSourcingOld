@@ -29,7 +29,7 @@
                     b => b.MigrationsAssembly("casApi")
                 )
             );
-            services.AddSingleton<ICasRepository,CasRepository>();
+            services.AddScoped<ICasRepository,CasRepository>();
 
             services.AddSingleton<IShaCodec, ShaCodec>();
         }

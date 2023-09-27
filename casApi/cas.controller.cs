@@ -19,10 +19,9 @@ namespace casApi
     {
         private readonly ICasRepository casRepo;
         private readonly IShaCodec shaCodec;
-        private readonly IExtract<HttpRequest, string> _extractContentType;
 
-        IExtract<HttpRequest, string> extractContentType = Extract.fromHeader("Content-Type");
-        IExtract<HttpRequest, string> extractNamespace = Extract.fromHeader("Content-Type");
+        private readonly IExtract<HttpRequest, string> extractContentType = Extract.fromHeader("Content-Type");
+        private readonly IExtract<HttpRequest, string> extractNamespace = Extract.fromHeader("Content-Type");
 
 
         public CasController(ICasRepository casRepo, IShaCodec shaCodec)
@@ -36,15 +35,16 @@ namespace casApi
         {
             byte[] content = await RequestHelper.BodyToByteArray(Request);
             string computedSha = shaCodec.ComputeSha(content);
-            var existing = await casRepo.ContentItem(@namespace,computedSha);
+            var existing = await casRepo.ContentItem(@namespace, computedSha);
             var path = Request.Path;
-            ErrorsAnd<ContentItem> contentItemOrErrors = await _extractContentType.extract(Request).flatMapK(async contentType =>
+            ErrorsAnd<ContentItem> contentItemOrErrors = await extractContentType.extract(Request).flatMapK(async contentType =>
                 await (existing == null
                 ? processNewItem(new ContentItem(SHA: computedSha, Namespace: @namespace, MimeType: contentType, Data: content))
                 : processExistingItem(existing, computedSha, content)));
 
+            Response.ContentType = "text/plain; charset=utf-8";
 
-            await contentItemOrErrors.forHttpResponseString(Response, ci => $"{path}/content/{ci.SHA}", HappyStatusCode: 201);
+            await contentItemOrErrors.forHttpResponseString(Response, HappyStatusCode: existing==null?201:200, result: ci =>$"{path}/content/{ci.SHA}");
         }
 
         private async Task<ErrorsAnd<ContentItem>> processNewItem(ContentItem contentItem)

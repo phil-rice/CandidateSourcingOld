@@ -68,18 +68,17 @@ namespace xingyi.common.validator
 
             if (this.HasErrors())
             {
-                await Response.WriteAsync(string.Join("\n",Errors));
                 Response.StatusCode = FailStatusCode;
-
+                await Response.WriteAsync(string.Join("\n",Errors));
             }
             else
                 Response.StatusCode = HappyStatusCode;
         }
         public  async Task forHttpResponseString( HttpResponse Response, Func<T,string> result, int HappyStatusCode = 200, int FailStatusCode = 400)
         {
+             await forHttpResponse(Response, HappyStatusCode, FailStatusCode);
             if (!this.HasErrors())
                 await Response.WriteAsync(result(Value));
-             await forHttpResponse(Response, HappyStatusCode, FailStatusCode);
         }
 
     }

@@ -9,15 +9,14 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
+using PactNet.Infrastructure.Outputters;
+using Microsoft.AspNetCore;
 
 
 
 namespace casApi
 {
 
-    using PactNet.Infrastructure.Outputters;
-    using NUnit.Framework;
-    using Microsoft.AspNetCore;
 
     public class NUnitOutput : IOutput
     {
@@ -38,9 +37,9 @@ namespace casApi
 
             webhost = WebHost.CreateDefaultBuilder()
             .UseStartup<Startup>() // Your regular Startup class
-            .ConfigureServices(services =>
+            .ConfigureTestServices(services =>
             {
-                services.AddTransient<ICasRepository, MockCasRepository>();
+                services.AddScoped<ICasRepository, MockCasRepository>();
 
             })
             .UseUrls(url)
@@ -72,7 +71,6 @@ namespace casApi
                         .PactUri(path + "/casclient-cas.json")
                         .Verify();
 
-            // To write to test output in NUnit
             TestContext.Out.WriteLine("Verification completed.");
         }
     }

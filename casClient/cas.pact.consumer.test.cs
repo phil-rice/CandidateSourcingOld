@@ -51,7 +51,6 @@
                   Status = 200,
                   Headers = new Dictionary<string, object>
                   {
-                  { "Content-Type", "text/plain; charset=utf-8" }
                   },
                   Body = "ResponseSHA" // mock response
               });
