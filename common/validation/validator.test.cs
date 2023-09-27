@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Linq;
-using Xunit;
+using NUnit.Framework;
 
 namespace xingyi.common.validator
 {
@@ -12,28 +12,28 @@ namespace xingyi.common.validator
 
     public class ValidatorTests
     {
-        [Fact]
+        [Test]
         public void PredicateValidator_ReturnsErrorMessage_WhenPredicateFails()
         {
             var validator = IValidator<int>.FromPredicate(x => x > 0, x => "Number must be positive");
 
             var errors = validator.Validate(-1).ToList();
 
-            Assert.Single(errors);
-            Assert.Equal("Number must be positive", errors[0]);
+            Assert.AreEqual(1, errors.Count);
+            Assert.AreEqual("Number must be positive", errors[0]);
         }
 
-        [Fact]
+        [Test]
         public void PredicateValidator_NoErrorMessage_WhenPredicatePasses()
         {
             var validator = IValidator<int>.FromPredicate(x => x > 0, x => "Number must be positive");
 
             var errors = validator.Validate(5).ToList();
 
-            Assert.Empty(errors);
+            Assert.IsEmpty(errors);
         }
 
-        [Fact]
+        [Test]
         public void CompositeValidator_ReturnsAllErrorMessages()
         {
             var validator = IValidator<int>.Compose(
@@ -43,12 +43,12 @@ namespace xingyi.common.validator
 
             var errors = validator.Validate(-5).ToList();
 
-            Assert.Equal(2, errors.Count);
+            Assert.AreEqual(2, errors.Count);
             Assert.Contains("Number must be positive", errors);
             Assert.Contains("Number must be even", errors);
         }
 
-        [Fact]
+        [Test]
         public void CompositeValidator_NoErrorMessages_WhenAllValid()
         {
             var validator = IValidator<int>.Compose(
@@ -58,7 +58,7 @@ namespace xingyi.common.validator
 
             var errors = validator.Validate(6).ToList();
 
-            Assert.Empty(errors);
+            Assert.IsEmpty(errors);
         }
     }
 }

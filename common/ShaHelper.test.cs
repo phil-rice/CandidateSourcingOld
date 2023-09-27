@@ -1,25 +1,25 @@
 ﻿namespace xingyi.common
 {
     using System.Text;
-    using Xunit;
+    using NUnit.Framework;
 
     public class SHAHelperTests
     {
-        IShaCodec codex=new ShaCodec();
+        IShaCodec codex = new ShaCodec();
 
-        [Fact]
+        [Test]
         public void TestComputeSha()
         {
             // Sample content and its corresponding SHA
             byte[] content = Encoding.UTF8.GetBytes("SampleContent");
-            string expectedSha = "sKpT6KOKK6kwIvgbWwjyiTQuzn3mH4OUM55oDoaepl4"; 
-            
+            string expectedSha = "sKpT6KOKK6kwIvgbWwjyiTQuzn3mH4OUM55oDoaepl4";
+
             string computedSha = codex.ComputeSha(content);
 
-            Assert.Equal(expectedSha, computedSha);
+            Assert.AreEqual(expectedSha, computedSha);
         }
 
-        [Fact]
+        [Test]
         public void TestValidateCorrectSha()
         {
             byte[] content = Encoding.UTF8.GetBytes("SampleContent");
@@ -30,11 +30,11 @@
             Assert.True(isValid);
         }
 
-        [Fact]
+        [Test]
         public void TestValidateIncorrectSha()
         {
             byte[] content = Encoding.UTF8.GetBytes("SampleContent");
-            string incorrectSha = "INCORRECT_SHA"; 
+            string incorrectSha = "INCORRECT_SHA";
 
             bool isValid = codex.Validate(content, incorrectSha);
 

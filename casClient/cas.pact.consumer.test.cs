@@ -2,7 +2,7 @@
 {
     using PactNet.Mocks.MockHttpService;
     using PactNet.Mocks.MockHttpService.Models;
-    using Xunit;
+    using NUnit.Framework;
     using PactNet.Infrastructure.Outputters;
     using PactNet;
     using xingyi.common;
@@ -31,7 +31,7 @@
 
         }
 
-        [Fact]
+        [Test]
         async public Task EnsureCasClientHandlesAddItemEndpoint()
         {
             _mockProviderService
@@ -49,18 +49,18 @@
               .WillRespondWith(new ProviderServiceResponse
               {
                   Status = 201,
-                  Headers = new Dictionary<string, object> { { "Content-Type", "text/plain; charset=utf-8" }},
+                  Headers = new Dictionary<string, object> { { "Content-Type", "text/plain; charset=utf-8" } },
                   Body = "/cas/someNs/content/h9FJy0JMA4dlbyEdJYn7Wx4WIpkhMJ6YWIQZzMqKc2I"
               });
             byte[] bytes = Encoding.ASCII.GetBytes("somedata");
-        var result = await Client.AddItemAsync("someNs", bytes, "application/octet-stream");
+            var result = await Client.AddItemAsync("someNs", bytes, "application/octet-stream");
 
-        Assert.Equal("/cas/someNs/content/h9FJy0JMA4dlbyEdJYn7Wx4WIpkhMJ6YWIQZzMqKc2I", result);
+            Assert.AreEqual("/cas/someNs/content/h9FJy0JMA4dlbyEdJYn7Wx4WIpkhMJ6YWIQZzMqKc2I", result);
 
             _mockProviderService.VerifyInteractions();
             pactBuilder.Build();
         }
 
 
-}
+    }
 }

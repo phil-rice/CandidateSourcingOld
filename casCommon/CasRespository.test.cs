@@ -55,7 +55,7 @@ namespace xingyi.cas.common
             await _dbContext.saveAllChanges();
 
             var savedItem = await _dbContext.ContentItems.FindAsync(ci1.Namespace, ci1.SHA);
-            Assert.Equals(ci1, savedItem);
+            Assert.AreEqual(ci1, savedItem);
         }
 
         [Test]
@@ -66,7 +66,7 @@ namespace xingyi.cas.common
 
             var fetchedItem = await _repository.ContentItem(ci1.Namespace, ci1.SHA);
 
-            Assert.Equals(ci1, fetchedItem);
+            Assert.AreEqual(ci1, fetchedItem);
         }
 
         [Test]
