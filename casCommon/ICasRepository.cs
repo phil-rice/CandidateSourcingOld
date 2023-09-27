@@ -47,12 +47,12 @@ namespace xingyi.cas.common
     public class MockCasRepository : ICasRepository
     {
         private readonly List<ContentItem> _mockData;
-       
+
 
         public MockCasRepository()
         {
             _mockData = new List<ContentItem>();
-     
+
         }
 
         public Task<ContentItem> ContentItem(string nameSpace, string sha)

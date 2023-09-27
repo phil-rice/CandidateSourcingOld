@@ -1,4 +1,4 @@
-﻿namespace xingyi.cas.common 
+﻿namespace xingyi.cas.common
 {
     using System.ComponentModel.DataAnnotations;
 
@@ -26,6 +26,26 @@
             this.MimeType = MimeType;
             this.Data = Data;
         }
-    }
+        public override bool Equals(object obj)
+        {
+            if (obj is ContentItem otherItem)
+            {
+                return SHA == otherItem.SHA &&
+                       Namespace == otherItem.Namespace &&
+                       MimeType == otherItem.MimeType &&
+                       Enumerable.SequenceEqual(Data, otherItem.Data);
+            }
 
+            return false;
+        }
+
+        public override int GetHashCode()
+        {
+            int hashCode = SHA?.GetHashCode() ?? 0;
+            hashCode = (hashCode * 397) ^ (Namespace?.GetHashCode() ?? 0);
+            hashCode = (hashCode * 397) ^ (MimeType?.GetHashCode() ?? 0);
+            hashCode = (hashCode * 397) ^ (Data?.Sum(b => b) ?? 0); // Simplified approach for byte array, could be enhanced for larger data.
+            return hashCode;
+        }
+    }
 }
