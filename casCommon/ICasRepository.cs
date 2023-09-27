@@ -51,7 +51,7 @@ namespace xingyi.cas.common
 
         public MockCasRepository()
         {
-            _mockData = new List<ContentItem>();
+            _mockData = new List<ContentItem> { new ContentItem("someNs", "-AFBB8Hv7uIEEmV1Srn0Y-OkfnMplM-FX8TEh4-SucM", "text/plain", Encoding.ASCII.GetBytes("alreadyin"))};
 
         }
 
@@ -73,5 +73,7 @@ namespace xingyi.cas.common
         }
 
     }
+
+
 
 }
