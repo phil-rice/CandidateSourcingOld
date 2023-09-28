@@ -4,10 +4,12 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using xingyi.cas.client;
 using Microsoft.EntityFrameworkCore;
-
 namespace xingyi.events.tests
 {
+    using static xingi.events.tests.EventFixture;
     using Json = Dictionary<string, object>;
+
+
     public class JsonEventExecutorTests
     {
         private class FakeCasJsonGetter : ICasJsonGetter
@@ -64,24 +66,18 @@ namespace xingyi.events.tests
         [Test]
         public void ShouldDeserializeJsonToListOfEventsCorrectly()
         {
-            // Arrange
-            var expectedEvents = new List<Event>
-        {
-            new SetToCasEvent("namespace1", "sha1"),
-            new SetFieldToValueEvent("field1", "value1"),
-            new SetFieldToCasEvent("field2", "namespace2", "sha2")
-        };
 
-            string jsonString = Event.listToJson(expectedEvents);
+
+            string jsonString = Event.listToJson(ev123);
 
             // Act
             var actualEvents = Event.jsonToList(jsonString); // Adjust the call if the method is not public or static.
 
             // Assert
-            Assert.AreEqual(expectedEvents.Count, actualEvents.Count);
-            for (int i = 0; i < expectedEvents.Count; i++)
+            Assert.AreEqual(ev123.Count, actualEvents.Count);
+            for (int i = 0; i < ev123.Count; i++)
             {
-                Assert.AreEqual(expectedEvents[i], actualEvents[i]);
+                Assert.AreEqual(ev123[i], actualEvents[i]);
             }
         }
 
@@ -138,16 +134,14 @@ namespace xingyi.events.tests
         public async Task TestAddAsyncTwice()
         {
             var repo = new EventStoreRepository(_dbContext);
-            var event1 = new SetToCasEvent("namespace1", "sha1");
-            var newEvent = new SetFieldToValueEvent("field1", "value1");
 
-            await repo.addAsync("testNamespace", "testName", event1);
-            await repo.addAsync("testNamespace", "testName", newEvent);
+            await repo.addAsync("testNamespace", "testName", ev1);
+            await repo.addAsync("testNamespace", "testName", ev2);
 
             var eventsList = await repo.getAsync("testNamespace", "testName");
             Assert.AreEqual(2, eventsList.Count);
-            Assert.AreEqual(event1, eventsList[0]);
-            Assert.AreEqual(newEvent, eventsList[1]);
+            Assert.AreEqual(ev1, eventsList[0]);
+            Assert.AreEqual(ev2, eventsList[1]);
         }
     }
 

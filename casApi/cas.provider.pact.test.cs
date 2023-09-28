@@ -1,6 +1,9 @@
 ﻿using Microsoft.AspNetCore.TestHost;
 using Microsoft.EntityFrameworkCore;
 using PactNet;
+using PactNet.Infrastructure.Outputters;
+
+using PactNet.Verifier;
 using xingyi.cas.common;
 using xingyi.common;
 using NUnit.Framework;
@@ -18,60 +21,61 @@ namespace casApi
 {
 
 
-    public class NUnitOutput : IOutput
-    {
-        public void WriteLine(string line)
-        {
-            Console.WriteLine(line);
-            TestContext.WriteLine(line);
-        }
-    }
+	public class NUnitOutput : IOutput
+	{
+		public void WriteLine(string line)
+		{
+			Console.WriteLine(line);
+			TestContext.WriteLine(line);
+		}
+	}
 
-    public class CasProviderTest : IDisposable
-    {
-        private IWebHost webhost;
+	public class CasProviderTest
+	{
 
-        static readonly string url = "http://localhost:9222";
-        public CasProviderTest()
-        {
+		static readonly string url = "http://localhost:9222";
+		public CasProviderTest()
+		{
+		}
 
-            webhost = WebHost.CreateDefaultBuilder()
-            .UseStartup<Startup>() // Your regular Startup class
-            .ConfigureTestServices(services =>
-            {
-                services.AddScoped<ICasRepository, MockCasRepository>();
+		[Test]
+		public void testVerifyPacts()
+		{
+			var config = new PactVerifierConfig
+			{
+				LogLevel = PactLogLevel.Information,
+				Outputters = new List<IOutput> { new NUnitOutput() },
+			};
 
-            })
-            .UseUrls(url)
-            .Build();
+			string pactPath = @"..\..\..\..\artifacts\pacts/casclient-cas.json";
 
-            webhost.Start();
-        }
+			var webhost = WebHost.CreateDefaultBuilder()
+				.UseStartup<Startup>()
+				.ConfigureTestServices(services =>
+				{
+					services.AddScoped<ICasRepository, MockCasRepository>();
 
-        public void Dispose()
-        {
-            webhost?.Dispose();
-        }
+				})
+				.UseUrls(url)
+				.Build();
 
-        [Test]
-        public void EnsureCasAPIHonoursPactWithConsumer()
-        {
-            IPactVerifier pactVerifier = new PactVerifier(new PactVerifierConfig
-            {
-                Outputters = new List<IOutput> { new NUnitOutput() },
-                Verbose = true // Output verbose verification logs to the test output
-            });
+			webhost.Start();
+			try
+			{
+				IPactVerifier verifier = new PactVerifier(config);
+				verifier
+					.ServiceProvider("Events", new Uri(url))
+					.WithFileSource(new FileInfo(pactPath))
+					.WithRequestTimeout(TimeSpan.FromSeconds(5))
+					.WithSslVerificationDisabled()
+					.Verify();
+			}
+			finally
+			{
+				webhost.StopAsync();
+				TestContext.Out.WriteLine("Verification completed.");
+			}
+		}
 
-
-            var path = Path.GetFullPath(Path.Combine(".", @"..\..\..\..\artifacts\pacts"));
-            Console.WriteLine($"Path: {path}");
-
-            pactVerifier.ServiceProvider("Cas", url)
-                        .HonoursPactWith("CasClient")
-                        .PactUri(path + "/casclient-cas.json")
-                        .Verify();
-
-            TestContext.Out.WriteLine("Verification completed.");
-        }
-    }
+	}
 }

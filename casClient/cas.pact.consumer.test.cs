@@ -1,7 +1,6 @@
 ﻿namespace xingyi.cas.client
 {
-    using PactNet.Mocks.MockHttpService;
-    using PactNet.Mocks.MockHttpService.Models;
+
     using NUnit.Framework;
     using PactNet.Infrastructure.Outputters;
     using PactNet;
@@ -12,138 +11,103 @@
 
     public class CasClientPact
     {
-        private IPactBuilder pactBuilder;
-        IMockProviderService _mockProviderService;
-        PactVerifier _verifier;
+        private readonly IPactBuilderV2 pact;
+        private readonly int port = 9222;
         static string ServiceBaseUri => "http://localhost:9222";
         static IShaCodec _shaCodec = new ShaCodec();
         public CasClient Client => new CasClient(new DefaultHttpClient(new System.Net.Http.HttpClient(), ServiceBaseUri), _shaCodec);
 
         public CasClientPact()
         {
-            this.pactBuilder = new PactBuilder(new PactConfig
+            var config = new PactConfig
             {
-                SpecificationVersion = "2.0.0",
-                PactDir = @"..\..\..\..\artifacts\pacts",
-                LogDir = @"..\..\..\..\artifacts\pactlogs"
-            }).ServiceConsumer("CasClient").HasPactWith("Cas");
+                PactDir = @"..\..\..\..\artifacts\pacts"
+            };
 
+            IPactV2 pact = Pact.V2("CasClient", "Cas", config);
 
-            _mockProviderService = pactBuilder.MockService(9222);
-
+            this.pact = pact.WithHttpInteractions(9222);
         }
 
         [OneTimeTearDown]
         public void makePactFilesAtEnd()
         {
-            pactBuilder.Build();
-            _mockProviderService.Stop();
         }
 
 
         [Test]
         async public Task EnsureCasClientHandlesAddItemEndpoint()
         {
-            _mockProviderService
+            pact
               .UponReceiving("A request to add item")
-              .With(new ProviderServiceRequest
-              {
-                  Method = HttpVerb.Post,
-                  Path = "/cas/someNs",
-                  Headers = new Dictionary<string, object>
-                  {
-                  { "Content-Type", "application/octet-stream" }
-                  },
-                  Body = "somedata"
-              })
-              .WillRespondWith(new ProviderServiceResponse
-              {
-                  Status = 201,
-                  Headers = new Dictionary<string, object> { { "Content-Type", "text/plain; charset=utf-8" } },
-                  Body = "/cas/someNs/content/h9FJy0JMA4dlbyEdJYn7Wx4WIpkhMJ6YWIQZzMqKc2I"
-              });
-            byte[] bytes = Encoding.ASCII.GetBytes("somedata");
-            var result = await Client.AddItemAsync("someNs", bytes, "application/octet-stream");
+              .WithRequest(HttpMethod.Post, "/cas/someNs")
+              .WithBody("somedata", "application/octet-stream")
+              .WillRespond()
+              .WithStatus(201)
+              .WithBody("/cas/someNs/content/h9FJy0JMA4dlbyEdJYn7Wx4WIpkhMJ6YWIQZzMqKc2I", "text/plain; charset=utf-8");
 
-            Assert.AreEqual("/cas/someNs/content/h9FJy0JMA4dlbyEdJYn7Wx4WIpkhMJ6YWIQZzMqKc2I", result);
+            await pact.VerifyAsync(async ctx =>
+            {
+                byte[] bytes = Encoding.ASCII.GetBytes("somedata");
+                var result = await Client.AddItemAsync("someNs", bytes, "application/octet-stream");
 
-            _mockProviderService.VerifyInteractions();
-        
+                Assert.AreEqual("/cas/someNs/content/h9FJy0JMA4dlbyEdJYn7Wx4WIpkhMJ6YWIQZzMqKc2I", result);
+
+            });
+
         }
 
         [Test]
         async public Task EnsureCasClientHandlesAddItemEndpointWhenAlreadyIn()
         {
-            _mockProviderService
-              .UponReceiving("A request to add item that is already stored")
-              .With(new ProviderServiceRequest
-              {
-                  Method = HttpVerb.Post,
-                  Path = "/cas/someNs",
-                  Headers = new Dictionary<string, object>
-                  {
-                  { "Content-Type", "application/octet-stream" }
-                  },
-                  Body = "alreadyin"
-              })
-              .WillRespondWith(new ProviderServiceResponse
-              {
-                  Status = 200,
-                  Headers = new Dictionary<string, object> { { "Content-Type", "text/plain; charset=utf-8" } },
-                  Body = "/cas/someNs/content/-AFBB8Hv7uIEEmV1Srn0Y-OkfnMplM-FX8TEh4-SucM"
-              });
-            byte[] bytes = Encoding.ASCII.GetBytes("alreadyin");
-            var result = await Client.AddItemAsync("someNs", bytes, "application/octet-stream");
+            pact
+           .UponReceiving("A request to add item that is already stored")
+           .WithRequest(HttpMethod.Get, "/cas/someNs")
+           .WithBody("alreadyin", "application/octet-stream")
+           .WillRespond()
+           .WithStatus(200)
+           .WithBody("/cas/someNs/content/-AFBB8Hv7uIEEmV1Srn0Y-OkfnMplM-FX8TEh4-SucM", "text/plain; charset=utf-8");
 
-            Assert.AreEqual("/cas/someNs/content/-AFBB8Hv7uIEEmV1Srn0Y-OkfnMplM-FX8TEh4-SucM", result);
-
-            _mockProviderService.VerifyInteractions();
-            
+            await pact.VerifyAsync(async ctx =>
+            {
+                byte[] bytes = Encoding.ASCII.GetBytes("alreadyin");
+                var result = await Client.AddItemAsync("someNs", bytes, "application/octet-stream");
+                Assert.AreEqual("/cas/someNs/content/-AFBB8Hv7uIEEmV1Srn0Y-OkfnMplM-FX8TEh4-SucM", result);
+            });
         }
 
         [Test]
         async public Task EnsureCasClientHandlesGetEndpointWhenIn()
         {
-            _mockProviderService
-              .UponReceiving("A request to get item that is in the store")
-              .With(new ProviderServiceRequest
-              {
-                  Method = HttpVerb.Get,
-                  Path = "/cas/someNs/content/-AFBB8Hv7uIEEmV1Srn0Y-OkfnMplM-FX8TEh4-SucM"
-              })
-              .WillRespondWith(new ProviderServiceResponse
-              {
-                  Status = 200,
-                  Headers = new Dictionary<string, object> { { "Content-Type", "text/plain" } },
-                  Body = "alreadyin"
-              });
-            var result = await Client.GetItemAsync("someNs", "-AFBB8Hv7uIEEmV1Srn0Y-OkfnMplM-FX8TEh4-SucM");
-            var expected = new ContentItem("someNs", "-AFBB8Hv7uIEEmV1Srn0Y-OkfnMplM-FX8TEh4-SucM", "text/plain", Encoding.ASCII.GetBytes("alreadyin"));
-            Assert.AreEqual(expected, result);
+            pact
+         .UponReceiving("A request to get item that is in the store")
+         .WithRequest(HttpMethod.Get, "/cas/someNs/content/-AFBB8Hv7uIEEmV1Srn0Y-OkfnMplM-FX8TEh4-SucM")
+         .WillRespond()
+         .WithStatus(200)
+         .WithBody("alreadyin", "text/plain; charset=utf-8");
 
-            _mockProviderService.VerifyInteractions();
-
+            await pact.VerifyAsync(async ctx =>
+            {
+                var result = await Client.GetItemAsync("someNs", "-AFBB8Hv7uIEEmV1Srn0Y-OkfnMplM-FX8TEh4-SucM");
+                var expected = new ContentItem("someNs", "-AFBB8Hv7uIEEmV1Srn0Y-OkfnMplM-FX8TEh4-SucM", "text/plain", Encoding.ASCII.GetBytes("alreadyin"));
+                Assert.AreEqual(expected, result);
+            });
         }
         [Test]
         async public Task EnsureCasClientHandlesGetEndpointWhenNotIn()
         {
-            _mockProviderService
-              .UponReceiving("A request to get item that is not in the store")
-              .With(new ProviderServiceRequest
-              {
-                  Method = HttpVerb.Get,
-                  Path = "/cas/someNs/content/notIn"
-              })
-              .WillRespondWith(new ProviderServiceResponse
-              {
-                  Status = 404
-              });
-            byte[] bytes = Encoding.ASCII.GetBytes("somedata");
-            var result = await Client.GetItemAsync("someNs","notIn");
+            pact.UponReceiving("A request to get item that is not in the store")
+    .WithRequest(HttpMethod.Get, "/cas/someNs/content/notIn")
+    .WillRespond()
+    .WithStatus(404);
 
-            Assert.IsNull( result);
+            await pact.VerifyAsync(async ctx =>
+            {
+                byte[] bytes = Encoding.ASCII.GetBytes("somedata");
+                var result = await Client.GetItemAsync("someNs", "notIn");
 
-            _mockProviderService.VerifyInteractions();
+                Assert.IsNull(result);
+            });
         }
     }
 }

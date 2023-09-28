@@ -9,7 +9,7 @@
     public interface Event
     {
 
-        static JsonSerializerSettings settings = new JsonSerializerSettings { TypeNameHandling = TypeNameHandling.All };
+         static JsonSerializerSettings settings { get; } = new JsonSerializerSettings { TypeNameHandling = TypeNameHandling.All };
         static List<Event> jsonToList(string json)
         {
             return JsonConvert.DeserializeObject<List<Event>>(json, settings);

@@ -81,6 +81,31 @@ namespace xingyi.events
             json[e.fieldName] = await getter.GetJsonAsync(e.nameSpace, e.sha);
             return json;
         }
+    }
+    public class DebugJsonEventExecutor : IEventExecutor<Json>
+    {
+        public Json zero()
+        {
+            return new Dictionary<string, object> { ["count"] = 1, ["processed"] = new List<string>() };
+        }
+        async Task<Json> process(Dictionary<string, object> dic, string name)
+        {
+            dic["count"] = ((int)dic["count"]) + 1;
+            ((List<string>)dic["processed"]).Add(name);
+            return dic;
+        }
+        public Task<Json> SetToCas(SetToCasEvent e, Json json)
+        {
+            return process(json, $"setToCas({e.nameSpace})");
+        }
+        public Task<Json> SetFieldToValue(SetFieldToValueEvent e, Json json)
+        {
+            return process(json, $"SetFieldToValue({e.fieldName})");
 
+        }
+        public Task<Json> SetFieldToCas(SetFieldToCasEvent e, Json json)
+        {
+            return process(json, $"setFieldToCas({e.nameSpace})");
+        }
     }
 }
