@@ -21,7 +21,6 @@ namespace casApi
         private readonly IShaCodec shaCodec;
 
         private readonly IExtract<HttpRequest, string> extractContentType = Extract.fromHeader("Content-Type");
-        private readonly IExtract<HttpRequest, string> extractNamespace = Extract.fromHeader("Content-Type");
 
 
         public CasController(ICasRepository casRepo, IShaCodec shaCodec)
