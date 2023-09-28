@@ -1,4 +1,6 @@
-﻿using System.Net.Http.Headers;
+﻿using System.Collections.Generic;
+using System.Net.Http.Headers;
+using System.Text.Json;
 using xingyi.cas.common;
 using xingyi.common;
 using xingyi.common.http;
@@ -10,13 +12,18 @@ namespace xingyi.cas.client
         Task<string> AddItemAsync(string nameSpace, byte[] payload, string mimeType);
     }
 
+    public interface ICasJsonGetter
+    {
+        Task<Dictionary<string, object>> GetJsonAsync(string nameSpace, string sha);
+
+    }
     public interface ICasGetter
     {
         Task<ContentItem> GetItemAsync(string nameSpace, string sha);
     }
 
 
-    public class CasClient : ICasAdder, ICasGetter
+    public class CasClient : ICasAdder, ICasGetter, ICasJsonGetter
     {
         private readonly IHttpClient httpClient;
         private readonly IShaCodec shaCodec;
@@ -43,6 +50,16 @@ namespace xingyi.cas.client
             var checkedSha = shaCodec.ComputeSha(data);
             if (checkedSha != sha) throw new ShaMismatchException(sha, checkedSha, data);
             return new ContentItem(nameSpace, sha, MimeType, data);
+        }
+
+        public async Task<Dictionary<string, object>> GetJsonAsync(string nameSpace, string sha)
+        {
+            var contentItem = await GetItemAsync(nameSpace, sha);
+            if (contentItem == null) throw new CasNotFoundException(nameSpace, sha);
+            if (!contentItem.MimeType.Contains("json")) throw new CasNotJsonException(contentItem);
+            string jsonString = System.Text.Encoding.UTF8.GetString(contentItem.Data);
+            Dictionary<string, object> result = JsonSerializer.Deserialize<Dictionary<string, object>>(jsonString);
+            return result;
         }
     }
 
