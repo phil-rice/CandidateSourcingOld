@@ -24,7 +24,12 @@ namespace eventApi
         private readonly IEventStoreAdder adder;
         private readonly IEventExecutor<Dictionary<string, object>> eventExecutor;
 
-
+        public EventsController(IEventStoreGetter getter, IEventStoreAdder adder, IEventExecutor<Dictionary<string, object>> eventExecutor)
+        {
+            this.getter = getter;
+            this.adder = adder;
+            this.eventExecutor = eventExecutor;
+        }
 
         [HttpGet("{nameSpace}/{name}")]
         public async Task<IActionResult> GetEvents(string nameSpace, string name)

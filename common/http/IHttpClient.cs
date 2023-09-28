@@ -15,14 +15,14 @@ namespace xingyi.common.http
         Task<ErrorsAnd<HttpResponseMessage>> post(string uri, string contentType, byte[] body);
     }
 
+
     public class DefaultHttpClient : IHttpClient
     {
         readonly HttpClient httpClient;
 
-        public DefaultHttpClient(HttpClient httpClient, string baseUri)
+        public DefaultHttpClient(HttpClient httpClient)
         {
             this.httpClient = httpClient;
-            this.httpClient.BaseAddress = new Uri(baseUri);
         }
 
         async public Task<ErrorsAnd<HttpResponseMessage>> get(string uri)

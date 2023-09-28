@@ -9,6 +9,7 @@
     using xingyi.cas.client;
     using xingyi.cas.common;
     using xingyi.common;
+    using xingyi.common.http;
     using xingyi.events;
 
     public class Startup
@@ -31,9 +32,18 @@
                     b => b.MigrationsAssembly("eventApi")
                 )
             );
+            services.AddSingleton<IShaCodec, ShaCodec>();
             services.AddScoped<ICasJsonGetter, CasClient>();
+            services.AddHttpClient(CasClient.HttpClientName, client =>
+            {
+                client.BaseAddress = new Uri("https://localhost/");
+            });
+
             services.AddScoped<ICasAdder, CasClient>();
-            services.AddSingleton<JsonEventExecutor>();
+            services.AddScoped<IEventExecutor<Dictionary<string, object>>, JsonEventExecutor>();
+            services.AddScoped<IEventStoreGetter, EventStoreRepository>();
+            services.AddScoped<IEventStoreAdder, EventStoreRepository>();
+
 
         }
 

@@ -15,12 +15,17 @@
 		private IPactBuilderV2 pact;
 
 		static string ServiceBaseUri => "http://localhost:9223";
-		public EventClient Client => new EventClient(new DefaultHttpClient(new System.Net.Http.HttpClient(), ServiceBaseUri));
+		public EventClient Client;
 
 
 
 		public EventClientPact()
 		{
+			var httpClient = new System.Net.Http.HttpClient();
+			httpClient.BaseAddress = new Uri(ServiceBaseUri);
+			Client = new EventClient(new DefaultHttpClient(httpClient));
+
+
 			var config = new PactConfig
 			{
 				PactDir = @"..\..\..\..\artifacts\pacts"

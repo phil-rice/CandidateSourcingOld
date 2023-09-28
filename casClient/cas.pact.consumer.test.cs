@@ -15,10 +15,13 @@
         private readonly int port = 9222;
         static string ServiceBaseUri => "http://localhost:9222";
         static IShaCodec _shaCodec = new ShaCodec();
-        public CasClient Client => new CasClient(new DefaultHttpClient(new System.Net.Http.HttpClient(), ServiceBaseUri), _shaCodec);
-
+        public readonly CasClient Client;
         public CasClientPact()
         {
+            var httpClient = new System.Net.Http.HttpClient();
+            httpClient.BaseAddress = new Uri(ServiceBaseUri);
+            this.Client = CasClient.forTests(new DefaultHttpClient(httpClient), _shaCodec);
+
             var config = new PactConfig
             {
                 PactDir = @"..\..\..\..\artifacts\pacts"
@@ -50,7 +53,6 @@
             {
                 byte[] bytes = Encoding.ASCII.GetBytes("somedata");
                 var result = await Client.AddItemAsync("someNs", bytes, "application/octet-stream");
-
                 Assert.AreEqual("/cas/someNs/content/h9FJy0JMA4dlbyEdJYn7Wx4WIpkhMJ6YWIQZzMqKc2I", result);
 
             });
@@ -62,7 +64,7 @@
         {
             pact
            .UponReceiving("A request to add item that is already stored")
-           .WithRequest(HttpMethod.Get, "/cas/someNs")
+           .WithRequest(HttpMethod.Post, "/cas/someNs")
            .WithBody("alreadyin", "application/octet-stream")
            .WillRespond()
            .WithStatus(200)

@@ -28,12 +28,22 @@ namespace xingyi.cas.client
         private readonly IHttpClient httpClient;
         private readonly IShaCodec shaCodec;
 
-        public CasClient(IHttpClient httpClient, IShaCodec shaCodec)
+        public static string HttpClientName = "casClient";
+        public CasClient(IHttpClientFactory factory, IShaCodec shaCodec) // for config
+        {
+            this.httpClient = new DefaultHttpClient(factory.CreateClient(HttpClientName));
+            this.shaCodec = shaCodec;
+        }
+
+        public static CasClient forTests(IHttpClient httpClient, IShaCodec shaCodec)
+        {
+            return new CasClient(httpClient, shaCodec);
+        }
+        private CasClient(IHttpClient httpClient, IShaCodec shaCodec) // for tests
         {
             this.httpClient = httpClient;
             this.shaCodec = shaCodec;
         }
-
 
         public async Task<string> AddItemAsync(string nameSpace, byte[] payload, string mimeType)
         {
