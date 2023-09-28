@@ -1,4 +1,4 @@
-﻿namespace eventApi
+﻿namespace relationshipApi
 {
     using Microsoft.AspNetCore.Builder;
     using Microsoft.AspNetCore.Hosting;
@@ -7,11 +7,7 @@
     using Microsoft.Extensions.DependencyInjection;
     using Microsoft.Extensions.Hosting;
     using Microsoft.OpenApi.Models;
-    using xingyi.cas.client;
-    using xingyi.cas.common;
-    using xingyi.common;
-    using xingyi.common.http;
-    using xingyi.events;
+    using xingyi.relationships;
 
     public class Startup
     {
@@ -27,32 +23,19 @@
         {
             services.AddControllers();
 
-            services.AddDbContext<EventStoreDbContext>(options =>
+            services.AddDbContext<RelationshipDbContext>(options =>
                 options.UseSqlServer(
-                    Configuration.GetConnectionString("EventStore"),
-                    b => b.MigrationsAssembly("eventApi")
+                    Configuration.GetConnectionString("Relationships"),
+                    b => b.MigrationsAssembly("relationshipApi")
                 )
             );
-            services.AddSingleton<IShaCodec, ShaCodec>();
-            services.AddScoped<ICasJsonGetter, CasClient>();
-            services.AddHttpClient(CasClient.HttpClientName, client =>
-            {
-                client.BaseAddress = new Uri("https://localhost/");
-            });
-
-            services.AddScoped<ICasAdder, CasClient>();
-            services.AddScoped<IEventExecutor<Dictionary<string, object>>, JsonEventExecutor>();
-            services.AddScoped<IEventStoreGetter, EventStoreRepository>();
-            services.AddScoped<IEventStoreAdder, EventStoreRepository>();
-
             services.AddSwaggerGen(c =>
             {
-                c.SwaggerDoc("v1", new OpenApiInfo { Title = "Events", Version = "v1.0" });
+                c.SwaggerDoc("v1", new OpenApiInfo { Title = "Relationships", Version = "v1.0" });
             });
 
         }
 
-        // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
         {
             if (env.IsDevelopment())
@@ -68,8 +51,9 @@
             app.UseSwagger();
             app.UseSwaggerUI(c =>
             {
-                c.SwaggerEndpoint("/swagger/v1/swagger.json", "Events");
+                c.SwaggerEndpoint("/swagger/v1/swagger.json", "Relationship");
             });
+
 
             app.UseHttpsRedirection();
             app.UseStaticFiles();
