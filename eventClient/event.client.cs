@@ -19,6 +19,18 @@ namespace xingyi.events.client
         Task<Json> AddEvent(string nameSpace, string name, Event e);
     }
 
+    public interface ISetToCas
+    {
+        Task<Json> SetToCas(string nameSpace, string name, string objNameSpace, string objName);
+    }
+
+    public interface ISetFieldToValue {
+        Task<Json> SetField(string nameSpace, string name, string fieldName, object value);
+    }
+    public interface ISetFieldToCasValue {
+        Task<Json> SetField(string nameSpace, string name, string fieldName, string objNameSpace, string objName);
+    }
+
     public class EventClient : IRawEventsGetter, IProcessedEventsGetter, IAddEvent
     {
         private readonly IHttpClient httpClient;

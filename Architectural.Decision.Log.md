@@ -59,4 +59,12 @@ Because of SOLID design principles.
 * A piece of software should do one and only one thing
 * We should not inject an interface that does more than the recipient wants to do with it
 
+# Why are we not addressing the N+1 problem
+
+Example of problem: Given an entity and relation, find all the json at the end.
+At the moment we go to relationships and then for each found entity make another call
+
+Answer:
+* N is small, this is an MVP and there is no need to fix this for the MVP
+* Note the use of IRelationshipToJson is designed to mask this and allow a single place to fix it later
 

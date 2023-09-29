@@ -34,7 +34,7 @@ namespace xingyi.relationships
         public async Task<List<Relationship>> findBySubject(Entity subject)
         {
             return await context.Relationships
-                .Where(r => r.SubjectSource == subject.source &&
+                .Where(r => r.SubjectStore == subject.store &&
                             r.SubjectNamespace == subject.nameSpace &&
                             r.SubjectName == subject.name)
                 .ToListAsync();
@@ -43,7 +43,7 @@ namespace xingyi.relationships
         public async Task<List<Relationship>> findBySubjectAnd(Entity subject, Relation relation)
         {
             return await context.Relationships
-                .Where(r => r.SubjectSource == subject.source &&
+                .Where(r => r.SubjectStore == subject.store &&
                             r.SubjectNamespace == subject.nameSpace &&
                             r.SubjectName == subject.name &&
                             r.RelationshipNamespace == relation.nameSpace &&
@@ -54,12 +54,12 @@ namespace xingyi.relationships
         public async Task<Relationship?> findBySubjectAndObject(Entity subject, Relation relation, Entity obj)
         {
             return await context.Relationships
-                .FirstOrDefaultAsync(r => r.SubjectSource == subject.source &&
+                .FirstOrDefaultAsync(r => r.SubjectStore == subject.store &&
                                           r.SubjectNamespace == subject.nameSpace &&
                                           r.SubjectName == subject.name &&
                                           r.RelationshipNamespace == relation.nameSpace &&
                                           r.RelationshipName == relation.name &&
-                                          r.ObjectSource == obj.source &&
+                                          r.ObjectStore == obj.store &&
                                           r.ObjectNamespace == obj.nameSpace &&
                                           r.ObjectName == obj.name);
         }
@@ -67,7 +67,7 @@ namespace xingyi.relationships
         public async Task<List<Relationship>> findByObject(Entity obj)
         {
             return await context.Relationships
-                .Where(r => r.ObjectSource == obj.source &&
+                .Where(r => r.ObjectStore == obj.store &&
                             r.ObjectNamespace == obj.nameSpace &&
                             r.ObjectName == obj.name)
                 .ToListAsync();
@@ -76,7 +76,7 @@ namespace xingyi.relationships
         public async Task<List<Relationship>> findByObjectAnd(Entity obj, Relation relation)
         {
             return await context.Relationships
-                .Where(r => r.ObjectSource == obj.source &&
+                .Where(r => r.ObjectStore == obj.store &&
                             r.ObjectNamespace == obj.nameSpace &&
                             r.ObjectName == obj.name &&
                             r.RelationshipNamespace == relation.nameSpace &&

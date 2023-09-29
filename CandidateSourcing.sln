@@ -38,9 +38,11 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "eventApi", "eventApi\eventA
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "eventClient", "eventClient\eventClient.csproj", "{574AC2E2-CD32-4E95-A735-3F7182D876B6}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "relationshipCommon", "relationshipCommon\relationshipCommon.csproj", "{E85EF933-E6BA-4369-BCB3-CC7981179271}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "relationshipCommon", "relationshipCommon\relationshipCommon.csproj", "{E85EF933-E6BA-4369-BCB3-CC7981179271}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "relationshipApi", "relationshipApi\relationshipApi.csproj", "{747B4085-BF2F-43FF-9172-27842337C043}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "relationshipApi", "relationshipApi\relationshipApi.csproj", "{747B4085-BF2F-43FF-9172-27842337C043}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "relationshipClient", "relationshipClient\relationshipClient.csproj", "{0381507D-803F-4E79-9AE5-63F0F64AA98D}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -92,6 +94,10 @@ Global
 		{747B4085-BF2F-43FF-9172-27842337C043}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{747B4085-BF2F-43FF-9172-27842337C043}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{747B4085-BF2F-43FF-9172-27842337C043}.Release|Any CPU.Build.0 = Release|Any CPU
+		{0381507D-803F-4E79-9AE5-63F0F64AA98D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{0381507D-803F-4E79-9AE5-63F0F64AA98D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{0381507D-803F-4E79-9AE5-63F0F64AA98D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{0381507D-803F-4E79-9AE5-63F0F64AA98D}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
