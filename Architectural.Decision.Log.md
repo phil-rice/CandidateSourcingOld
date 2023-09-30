@@ -68,3 +68,10 @@ Answer:
 * N is small, this is an MVP and there is no need to fix this for the MVP
 * Note the use of IRelationshipToJson is designed to mask this and allow a single place to fix it later
 
+# Why is Job directly creating things in the event store instead of commands
+This is a MVP. Adding in a command layer is another layer of complexity
+
+While it dramatically improves testing and the ability to reason it will take time
+
+I can refactor it later
+

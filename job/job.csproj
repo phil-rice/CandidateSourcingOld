@@ -24,6 +24,7 @@
 		<ProjectReference Include="..\casClient\casClient.csproj" />
 		<ProjectReference Include="..\common\common.csproj" />
 		<ProjectReference Include="..\eventClient\eventClient.csproj" />
+		<ProjectReference Include="..\eventObjectMapping\eventObjectMapping.csproj" />
 		<ProjectReference Include="..\relationshipClient\relationshipClient.csproj" />
 	</ItemGroup>
 

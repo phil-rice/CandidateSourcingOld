@@ -14,11 +14,13 @@ namespace xingyi.relationships
         Task<Relationship?> findBySubjectAndObject(Entity subject, Relation relation, Entity obj);
         Task<List<Relationship>> findByObject(Entity obj);
         Task<List<Relationship>> findByObjectAnd(Entity obj, Relation relation);
+        Task<List<Relationship>> findAll(Entity entity);
     }
 
     public interface IRelationshipUpdater
     {
         Task set(Relationship relationship);
+        Task delete(Relationship relationship);
         Task update(Relationship relationship);
     }
 
@@ -84,6 +86,19 @@ namespace xingyi.relationships
                 .ToListAsync();
         }
 
+        public async Task<List<Relationship>> findAll(Entity entity)
+        {
+            return await context.Relationships
+                    .Where(r => (r.ObjectStore == entity.store &&
+                                r.ObjectNamespace == entity.nameSpace &&
+                                r.ObjectName == entity.name)
+                                ||
+                                (r.SubjectStore == entity.store &&
+                                          r.SubjectNamespace == entity.nameSpace &&
+                                          r.SubjectName == entity.name))
+                    .ToListAsync();
+        }
+
         public async Task set(Relationship relationship)
         {
             if (relationship.Id != 0) throw new Exception($"Cannot set with relationship because already has id {relationship}");
@@ -99,6 +114,12 @@ namespace xingyi.relationships
         public async Task update(Relationship relationship)
         {
             context.Relationships.Update(relationship);
+            await context.SaveChangesAsync();
+        }
+
+        public async Task delete(Relationship relationship)
+        {
+            context.Relationships.Remove(relationship);
             await context.SaveChangesAsync();
         }
 

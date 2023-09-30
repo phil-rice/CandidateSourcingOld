@@ -27,6 +27,7 @@
 
         [Key]
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
+        [IgnoreDuringEquals]
         public int Id { get; set; }
 
         [Required]
@@ -64,6 +65,8 @@
         public Entity subject() { return new Entity(SubjectStore, SubjectNamespace, SubjectName); }
         public Relation relation() { return new Relation(RelationshipNamespace, RelationshipName); }
         public Entity obj() { return new Entity(ObjectStore, ObjectNamespace, ObjectName); }
+
+
 
     }
 }
