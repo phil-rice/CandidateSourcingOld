@@ -15,7 +15,11 @@ namespace xingyi.common
         }
     }
 
-    public record ListDiffResult<T>(List<T> Added, List<T> Removed);
-
-
+    public record ListDiffResult<T>(List<T> Added, List<T> Removed)
+    {
+        public static ListDiffResult<T> empty()
+        {
+            return new ListDiffResult<T>(new List<T>(), new List<T>());
+        }
+    }
 }

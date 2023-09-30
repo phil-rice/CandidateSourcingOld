@@ -1,9 +1,16 @@
 ﻿namespace xingyi.cas.common
 {
     using System.ComponentModel.DataAnnotations;
+    using System.Text;
+    using xingyi.common;
 
     public class ContentItem
     {
+        public static ContentItem from(IShaCodec codec, string Namespace, string s, string MimeType = "application/json")
+        {
+            var data = Encoding.UTF8.GetBytes(s);
+            return new ContentItem(Namespace, codec.ComputeSha(data), MimeType, data);
+        }
         [Required]
         [MaxLength(256)] // Assuming a SHA-256 hash
         public string SHA { get; set; }

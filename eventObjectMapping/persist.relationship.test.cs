@@ -9,6 +9,9 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using xingyi.erm;
 using xingyi.relationships;
+using xingyi.common;
+using common.test;
+
 namespace xingyi.erm
 {
     using static xingyi.relationships.RelationshipFixture;
@@ -30,9 +33,8 @@ namespace xingyi.erm
         [SetUp]
         public void SetUp()
         {
-            mockUpdater = new Mock<IRelationshipUpdater>();
             mockFinder = new Mock<IRelationshipFinder>();
-            persistRelationships = new PersistRelationships(mockUpdater.Object, mockFinder.Object);
+            persistRelationships = new PersistRelationships( mockFinder.Object);
         }
 
         [Test]
@@ -53,14 +55,11 @@ namespace xingyi.erm
             mockFinder.Setup(f => f.findAll(e1)).Returns(Task.FromResult(existingRels));
 
             // Act
-            var result = await persistRelationships.update(relations, e1, dict);
+            var (Added, Removed) = await persistRelationships.update(relations, e1, dict);
 
             // Assert
-            // Here you can verify if the right methods on the mock objects were called, and check the result
-            mockUpdater.Verify(u => u.set(It.IsAny<Relationship>()), Times.Exactly(0));
-            mockUpdater.Verify(u => u.delete(It.IsAny<Relationship>()), Times.Exactly(0));
-
-            Assert.That(result, Is.EquivalentTo(newRels));
+            Assert.AreEqual(0, Added.Count());
+            Assert.AreEqual(0, Removed.Count());
         }
 
 
@@ -73,17 +72,13 @@ namespace xingyi.erm
             mockFinder.Setup(f => f.findAll(e1)).Returns(Task.FromResult(existingRels));
 
             // Act
-            var result = await persistRelationships.update(relations, e1, dict12changed);
+            var (Added, Removed) = await persistRelationships.update(relations, e1, dict12changed);
 
             // Assert
-            // Here you can verify if the right methods on the mock objects were called, and check the result
-            mockUpdater.Verify(u => u.set(rel114), Times.Exactly(1));
-            mockUpdater.Verify(u => u.set(rel125), Times.Exactly(1));
-            mockUpdater.Verify(u => u.delete(rel112), Times.Exactly(1));
-            mockUpdater.Verify(u => u.delete(rel123), Times.Exactly(1));
-
-            Assert.That(result, Is.EquivalentTo(newRels));
+            Assertions.ListsEqual<Relationship>(new List<Relationship> { rel114, rel125 }, Added);
+            Assertions.ListsEqual<Relationship>(new List<Relationship> { rel112, rel123 }, Removed);
         }
+
         [Test]
         public async Task TestUpdateAddsAndRemovesRelationshipsCorrectly_Changing_Dict1Changed()
         {
@@ -93,16 +88,10 @@ namespace xingyi.erm
             mockFinder.Setup(f => f.findAll(e1)).Returns(Task.FromResult(existingRels));
 
             // Act
-            var result = await persistRelationships.update(relations, e1, dict1changed);
+            var (Added, Removed) = await persistRelationships.update(relations, e1, dict1changed);
 
-            // Assert
-            // Here you can verify if the right methods on the mock objects were called, and check the result
-            mockUpdater.Verify(u => u.set(rel114), Times.Exactly(1));
-            mockUpdater.Verify(u => u.delete(rel112), Times.Exactly(1));
-            mockUpdater.Verify(u => u.set(It.IsAny<Relationship>()), Times.Exactly(1));
-            mockUpdater.Verify(u => u.delete(It.IsAny<Relationship>()), Times.Exactly(1));
-
-            Assert.That(result, Is.EquivalentTo(newRels));
+            Assertions.ListsEqual<Relationship>(new List<Relationship> { rel114 }, Added);
+            Assertions.ListsEqual<Relationship>(new List<Relationship> { rel112 }, Removed);
         }
 
         // You can add more tests to cover other scenarios

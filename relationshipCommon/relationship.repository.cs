@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
+using xingyi.common;
 
 namespace xingyi.relationships
 {
@@ -22,6 +23,12 @@ namespace xingyi.relationships
         Task set(Relationship relationship);
         Task delete(Relationship relationship);
         Task update(Relationship relationship);
+
+        public static async Task process(IRelationshipUpdater updater, ListDiffResult<Relationship> diffs)
+        {
+            foreach (var r in diffs.Added) await updater.set(r);
+            foreach (var r in diffs.Removed) await updater.delete(r);
+        }
     }
 
     public class RelationshipRepository : IRelationshipFinder, IRelationshipUpdater
