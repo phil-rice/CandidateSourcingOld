@@ -39,6 +39,13 @@ namespace xingyi.erm
     public interface IWorkOutHowToPersistCasEvent
     {
         Task<UpdateEventsResult> persist(EventCasObjDefn defn, Entity e, Dictionary<string, object> dict);
+
+        public static Task<UpdateEventsResult> workout<T>(IWorkOutHowToPersistCasEvent workout, EventCasObjDefn defn, Entity e, T t)
+        {
+            var json = JsonSerializer.Serialize<T>(t);
+            var dict = JsonSerializer.Deserialize<Dictionary<string, object>>(json);
+            return workout.persist(defn, e, dict);
+        }
     }
 
     public class PersistEventCasObjDefn : IWorkOutHowToPersistCasEvent

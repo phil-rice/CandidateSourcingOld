@@ -211,15 +211,40 @@ Thus we say 'when looking at an application it's about the section you are filli
 whether you can fill in a section
 
 
+# Apis
+We have separate APIs for
+* Content Addressable Storage (CAS)
+* Events (which uses CAS)
+* Relationships
+* Job (which is the only one the GUI needs to talk to)
+
+The job api provides the following
+* Make me a new application: a candidate is applying for a job
+* Find me all the applications that I need to do fill in something
+* Update an application
+
+# Gui
+
+The gui is almost entirely data driven. There is almost no business logic here.
+
+## Authentication and Authorisation
+I will use OAuth2. We just need to know that 'you are you' (Authentication). 
+
+The Authorisation is 'are you allowed to make an application', and 'can I fill in a section'.   
+
+## Home page
+
+If not logged in: Welcome/description and a 'press the button to login'
+
+If logged in: Sections list (need nice name)
 
 
+## Sections list
+* We can see the ones I need to fill in (and go back and edit them unless they are finished)
+* We can see the list of finished ones
 
- 
-
-
-
-
-
+## Section
+A section is entirely data driven. It's the questions/answers/scores. Title and comment.
 
 
 

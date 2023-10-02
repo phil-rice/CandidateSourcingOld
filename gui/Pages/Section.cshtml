@@ -1,0 +1,51 @@
+﻿@page
+@model gui.Pages.QuestionPageModel
+
+@{
+    var currentTemplate = Model.SectionData.SectionTemplate;
+}
+
+<h2>@currentTemplate.Title</h2>
+<p>@currentTemplate.Description</p>
+
+<form method="post">
+    @for (int i = 0; i < Model.SectionData.Answers.Count; i++)
+    {
+        var currentAnswer = Model.SectionData.Answers[i];
+
+        <h4>@currentAnswer.Question.Title</h4>
+        <p>@currentAnswer.Question.Description</p>
+
+        @if (currentAnswer.Question.ScoreOutOfTen)
+        {
+            <div>
+                <span id="sliderValue-@i">@currentAnswer.Score</span>
+                <input type="range" min="1" max="10" name="answers[@i].score"
+                       oninput="updateSliderValue(this.value, 'sliderValue-@i')" value="@currentAnswer.Score">
+            </div>
+        }
+
+        @if (currentAnswer.Question.Singleline)
+        {
+            <input type="text" class="full-width-input" name="answers[@i].AnswerText">
+            <br />
+        }
+        else
+        {
+            <textarea class="full-width-input" rows="4" name="answers[@i].AnswerText"></textarea>
+        }
+    }
+
+    <h4>Comments</h4>
+    <textarea cols="120" class="full-width-input" rows="6" name="Comments" placeholder="General comments..."></textarea>
+
+    <br />
+
+    <button type="submit" name="action" value="draft">Save Draft</button>
+    <button type="submit" name="action" value="submit">Submit</button>
+</form>
+<script>
+    function updateSliderValue(value, targetId) {
+        document.getElementById(targetId).textContent = value;
+    }
+</script>

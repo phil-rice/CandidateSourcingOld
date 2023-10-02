@@ -2,7 +2,9 @@
 {
     using System.ComponentModel.DataAnnotations;
     using System.ComponentModel.DataAnnotations.Schema;
-
+    using System.Diagnostics.Metrics;
+    using xingyi.common;
+    using xingyi.events.client;
 
     public record Relation(string nameSpace, string name);
     public record Entity(string store, string nameSpace, string name);
@@ -24,6 +26,28 @@
                 ObjectName = obj.name
             };
         }
+
+        public static List<Entity> objects(List<Relationship> rels)
+        {
+            return rels.Select(r => r.obj()).ToList();
+        }
+        public static List<Entity> subjects(List<Relationship> rels)
+        {
+            return rels.Select(r => r.subject()).ToList();
+        }
+        public static async Task<List<T>> fromSubjects<T>(IProcessedEventsGetter getter, List<Relationship> rels)
+        {
+            var applicationEntities = Relationship.subjects(rels);
+            var dicts = await Task.WhenAll(applicationEntities.Select(e => getter.GetProcessedEventsAsync(e.nameSpace, e.name)));
+            return Json.transformList<T>(dicts.ToList());
+        }
+        public static async Task<List<T>> fromObjs<T>(IProcessedEventsGetter getter, List<Relationship> rels)
+        {
+            var applicationEntities = Relationship.objects(rels);
+            var dicts = await Task.WhenAll(applicationEntities.Select(e => getter.GetProcessedEventsAsync(e.nameSpace, e.name)));
+            return Json.transformList<T>(dicts.ToList());
+        }
+
 
         [Key]
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]

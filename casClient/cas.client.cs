@@ -15,7 +15,11 @@ namespace xingyi.cas.client
     public interface ICasJsonGetter
     {
         Task<Dictionary<string, object>> GetJsonAsync(string nameSpace, string sha);
+    }
 
+    public interface ICasObjGetter
+    {
+        Task<T> GetObjAsync<T>(string nameSpace, string sha);
     }
     public interface ICasGetter
     {
@@ -23,7 +27,7 @@ namespace xingyi.cas.client
     }
 
 
-    public class CasClient : ICasAdder, ICasGetter, ICasJsonGetter
+    public class CasClient : ICasAdder, ICasGetter, ICasJsonGetter, ICasObjGetter
     {
         private readonly IHttpClient httpClient;
         private readonly IShaCodec shaCodec;
@@ -71,7 +75,16 @@ namespace xingyi.cas.client
             Dictionary<string, object> result = JsonSerializer.Deserialize<Dictionary<string, object>>(jsonString);
             return result;
         }
+
+        async public Task<T> GetObjAsync<T>(string nameSpace, string sha)
+        {
+            var contentItem = await GetItemAsync(nameSpace, sha);
+            if (contentItem == null) throw new CasNotFoundException(nameSpace, sha);
+            if (!contentItem.MimeType.Contains("json")) throw new CasNotJsonException(contentItem);
+            string jsonString = System.Text.Encoding.UTF8.GetString(contentItem.Data);
+            T result = JsonSerializer.Deserialize<T>(jsonString);
+            return result;
+        }
     }
-
-
 }
+

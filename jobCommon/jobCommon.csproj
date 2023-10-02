@@ -18,14 +18,23 @@
 		</PackageReference>
 		<PackageReference Include="ToString.Fody" Version="1.11.1" />
 		<PackageReference Include="Equals.Fody" Version="4.0.2" />
-	</ItemGroup>
-
-	<ItemGroup>
 		<ProjectReference Include="..\casClient\casClient.csproj" />
 		<ProjectReference Include="..\common\common.csproj" />
 		<ProjectReference Include="..\eventClient\eventClient.csproj" />
 		<ProjectReference Include="..\eventObjectMapping\eventObjectMapping.csproj" />
 		<ProjectReference Include="..\relationshipClient\relationshipClient.csproj" />
+		<PackageReference Include="Microsoft.EntityFrameworkCore.InMemory" Version="7.0.11" />
+		<PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="7.0.11" />
+		<PackageReference Include="Fody" Version="6.8.0">
+			<PrivateAssets>all</PrivateAssets>
+			<IncludeAssets>runtime; build; native; contentfiles; analyzers</IncludeAssets>
+		</PackageReference>
+		<PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="7.0.11">
+			<IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+			<PrivateAssets>all</PrivateAssets>
+		</PackageReference>
+
+
 	</ItemGroup>
 
 </Project>
